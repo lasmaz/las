@@ -1,0 +1,7 @@
+{
+  "name": "Copy of VocalStudio AI",
+  "description": "A professional-grade web based vocal recording and mixing studio powered by Gemini AI for intelligent preset generation.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
