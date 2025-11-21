@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import Knob from './Knob';
 import { MixerSettings, ScaleType, MusicalKey, MAQAMAT_INFO } from '../types';
@@ -113,17 +115,30 @@ const EffectRack: React.FC<EffectRackProps> = ({ settings, updateSetting }) => {
       </div>
 
       {/* Space / FX */}
-      <div className="glass-panel p-5 rounded-2xl">
+      <div className="glass-panel p-5 rounded-2xl flex flex-col">
          <PanelHeader 
             color="bg-cyan-500" 
             title="Spatial FX" 
             icon={<svg className="w-3 h-3 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
          />
-        <div className="grid grid-cols-2 gap-y-6 gap-x-4 place-items-center">
+        <div className="grid grid-cols-2 gap-y-6 gap-x-4 place-items-center mb-4">
           <Knob label="Reverb" value={settings.reverbMix} min={0} max={1} onChange={(v) => updateSetting('reverbMix', v)} color="cyan"/>
           <Knob label="Echo" value={settings.delayMix} min={0} max={1} onChange={(v) => updateSetting('delayMix', v)} color="cyan"/>
           <Knob label="Time" value={settings.delayTime} min={0} max={1} onChange={(v) => updateSetting('delayTime', v)} color="cyan"/>
           <Knob label="F-Back" value={settings.delayFeedback} min={0} max={0.9} onChange={(v) => updateSetting('delayFeedback', v)} color="cyan"/>
+        </div>
+        
+        <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between bg-zinc-900/30 p-3 rounded-xl">
+            <div className="flex flex-col">
+                <span className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">3D EFFECT</span>
+                <span className="text-[9px] text-zinc-500 font-medium">Stereo Widen</span>
+            </div>
+            <button 
+                onClick={() => updateSetting('spatial3D', !settings.spatial3D)}
+                className={`w-9 h-5 rounded-full transition-all duration-300 relative ${settings.spatial3D ? 'bg-cyan-500 shadow-[0_0_10px_rgba(34,211,238,0.4)]' : 'bg-zinc-800'}`}
+            >
+                <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-transform ${settings.spatial3D ? 'translate-x-4' : ''}`} />
+            </button>
         </div>
       </div>
 

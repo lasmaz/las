@@ -36,6 +36,7 @@ export interface MixerSettings {
   delayMix: number; // 0 to 1 (Echo Volume)
   delayTime: number; // 0 to 1 (seconds)
   delayFeedback: number; // 0 to 0.9
+  spatial3D: boolean; // 3D Widening Effect
   
   // Output
   outputGain: number; // 0 to 1.5
@@ -58,6 +59,7 @@ export const DEFAULT_MIXER_SETTINGS: MixerSettings = {
   delayMix: 0.2,
   delayTime: 0.3,
   delayFeedback: 0.3,
+  spatial3D: false,
   outputGain: 1.0,
 };
 
@@ -163,6 +165,7 @@ export const ARTIST_PRESETS: Preset[] = [
       highPass: true,
       highGain: 2,
       airMode: true,
+      spatial3D: true,
       compressorThreshold: -24,
       reverbMix: 0.8,
       delayMix: 0.4,

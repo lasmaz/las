@@ -1,4 +1,5 @@
 
+
 import { GoogleGenAI, Type } from '@google/genai';
 import { MixerSettings } from '../types';
 
@@ -28,9 +29,10 @@ export const generateMixerPreset = async (description: string, analysisData?: st
       delayMix: { type: Type.NUMBER, description: "Delay/Echo wet/dry mix, range 0.0 to 1.0" },
       delayTime: { type: Type.NUMBER, description: "Delay time in seconds, range 0.0 to 1.0" },
       delayFeedback: { type: Type.NUMBER, description: "Delay feedback amount, range 0.0 to 0.9" },
+      spatial3D: { type: Type.BOOLEAN, description: "Enable 3D Spatial widening effect (Dimension Expander)" },
       outputGain: { type: Type.NUMBER, description: "Master output gain multiplier, usually 0.8 to 1.2" }
     },
-    required: ["inputGain", "highPass", "autotuneAmount", "pitchShift", "scale", "musicalKey", "lowGain", "midGain", "highGain", "airMode", "compressorThreshold", "compressorRatio", "reverbMix", "delayMix", "delayTime", "delayFeedback", "outputGain"]
+    required: ["inputGain", "highPass", "autotuneAmount", "pitchShift", "scale", "musicalKey", "lowGain", "midGain", "highGain", "airMode", "compressorThreshold", "compressorRatio", "reverbMix", "delayMix", "delayTime", "delayFeedback", "spatial3D", "outputGain"]
   };
 
   const makeRequest = async (retryCount = 0): Promise<MixerSettings> => {

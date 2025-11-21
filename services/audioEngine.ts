@@ -1,4 +1,5 @@
 
+
 import { MixerSettings } from '../types';
 
 class AudioEngine {
@@ -29,9 +30,18 @@ class AudioEngine {
   private lowEQ: BiquadFilterNode | null = null;
   private midEQ: BiquadFilterNode | null = null;
   private highEQ: BiquadFilterNode | null = null;
-  private airFilter: BiquadFilterNode | null = null; // NEW: Air Effect Node
+  private airFilter: BiquadFilterNode | null = null; // Air Effect
   
   private compressor: DynamicsCompressorNode | null = null;
+  
+  // 3D / Width Nodes
+  private widthInputGain: GainNode | null = null;
+  private widthFilter: BiquadFilterNode | null = null;
+  private widthSplitter: ChannelSplitterNode | null = null;
+  private widthDelayL: DelayNode | null = null;
+  private widthDelayR: DelayNode | null = null;
+  private widthMerger: ChannelMergerNode | null = null;
+  
   private masterGain: GainNode | null = null;
   private monitorGain: GainNode | null = null;
   private monitorDelayNode: DelayNode | null = null; 
@@ -124,6 +134,21 @@ class AudioEngine {
     this.compressor = this.audioContext.createDynamicsCompressor();
     this.compressor.attack.value = 0.003;
     this.compressor.release.value = 0.25;
+    
+    // 3D EFFECT (Haas Widener)
+    this.widthInputGain = this.audioContext.createGain();
+    this.widthInputGain.gain.value = 0; // Default off
+    
+    this.widthFilter = this.audioContext.createBiquadFilter();
+    this.widthFilter.type = 'highpass';
+    this.widthFilter.frequency.value = 300; // Only widen mids/highs
+    
+    this.widthSplitter = this.audioContext.createChannelSplitter(2);
+    this.widthDelayL = this.audioContext.createDelay();
+    this.widthDelayR = this.audioContext.createDelay();
+    this.widthDelayL.delayTime.value = 0.010; // 10ms left
+    this.widthDelayR.delayTime.value = 0.020; // 20ms right
+    this.widthMerger = this.audioContext.createChannelMerger(2);
 
     // Spatial
     this.reverbNode = this.audioContext.createConvolver();
@@ -186,6 +211,21 @@ class AudioEngine {
     this.delayFeedbackNode.connect(this.delayNode); // Feedback Loop
     this.delayNode.connect(this.delayGain);
     this.delayGain.connect(this.masterGain);
+    
+    // 3. 3D / Width Send (Parallel)
+    this.compressor.connect(this.widthInputGain);
+    this.widthInputGain.connect(this.widthFilter);
+    this.widthFilter.connect(this.widthSplitter);
+    
+    // Splitter L -> Delay L -> Merger L
+    this.widthSplitter.connect(this.widthDelayL, 0);
+    this.widthDelayL.connect(this.widthMerger, 0, 0);
+    
+    // Splitter R -> Delay R -> Merger R
+    this.widthSplitter.connect(this.widthDelayR, 1);
+    this.widthDelayR.connect(this.widthMerger, 0, 1);
+    
+    this.widthMerger.connect(this.masterGain);
 
     // Dry Signal (Compressor -> Master)
     this.compressor.connect(this.masterGain);
@@ -472,6 +512,13 @@ class AudioEngine {
         // 5dB boost at 12kHz creates a nice "Air"
         const airGain = settings.airMode ? 5 : 0;
         this.airFilter.gain.setTargetAtTime(airGain, now, 0.1);
+    }
+    
+    // 3D SPATIAL Control
+    if (this.widthInputGain) {
+        // 0.5 gain mixed in creates a nice widening effect without overpowering center
+        const widthVal = settings.spatial3D ? 0.5 : 0;
+        this.widthInputGain.gain.setTargetAtTime(widthVal, now, 0.1);
     }
     
     if (this.compressor) {
